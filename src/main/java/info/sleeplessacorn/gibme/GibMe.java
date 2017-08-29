@@ -45,8 +45,9 @@ public class GibMe {
 
     @SubscribeEvent @SideOnly(Side.CLIENT)
     public static void onClientChatReceived(ClientChatReceivedEvent event) {
-        if (!GibMe.GibConfig.replaceGiveCmdMsg)
+        if (!GibConfig.replaceGiveCmdMsg)
             return;
+
         if (event.getMessage() instanceof TextComponentTranslation) {
             TextComponentTranslation msg = (TextComponentTranslation) event.getMessage();
             if ("commands.give.success".equals(msg.getKey())) {
