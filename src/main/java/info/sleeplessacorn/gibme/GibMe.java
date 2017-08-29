@@ -29,7 +29,7 @@ public class GibMe {
 
     @SubscribeEvent
     protected static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.player.world.isRemote || GibConfig.gibMeThese.length <= 0)
+        if (GibConfig.chanceToGib == 0 || GibConfig.gibMeThese.length < 1 || event.player.world.isRemote)
             return;
 
         if (event.player.world.getTotalWorldTime() % (GibConfig.attemptCooldown * 20) == 0) {
