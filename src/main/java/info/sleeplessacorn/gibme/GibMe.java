@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
@@ -13,6 +14,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 
@@ -36,6 +39,19 @@ public class GibMe {
                 ItemStack stack = GibMe.getStackFromString(GibConfig.gibMeThese[index]);
                 event.player.inventory.addItemStackToInventory(stack.copy());
                 GibMe.sendGibMessage(event.player, stack);
+            }
+        }
+    }
+
+    @SubscribeEvent @SideOnly(Side.CLIENT)
+    public static void onClientChatReceived(ClientChatReceivedEvent event) {
+        if (!GibMe.GibConfig.replaceGiveCmdMsg)
+            return;
+        if (event.getMessage() instanceof TextComponentTranslation) {
+            TextComponentTranslation msg = (TextComponentTranslation) event.getMessage();
+            if ("commands.give.success".equals(msg.getKey())) {
+                Object[] args = msg.getFormatArgs();
+                event.setMessage(new TextComponentTranslation("command.gibme", args[2], args[0], args[1]));
             }
         }
     }
@@ -74,6 +90,11 @@ public class GibMe {
         @Config.Comment("List of things to gib [format: modid:name:meta@amount]")
         @Config.LangKey("config.gibme.list")
         public static String[] gibMeThese = { "minecraft:dirt:0@1" };
+
+        @Config.Name("Replace Give Command Message")
+        @Config.Comment("Replaces the give command chat message with a special gib message [default: true]")
+        @Config.LangKey("config.gibme.givecmd")
+        public static boolean replaceGiveCmdMsg = true;
 
         @SubscribeEvent
         protected static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {

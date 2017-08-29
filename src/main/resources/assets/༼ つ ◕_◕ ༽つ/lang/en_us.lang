@@ -1,4 +1,5 @@
 message.gibme=༼ つ ◕_◕ ༽つ %s ༼ つ ◕_◕ ༽つ
+command.gibme=%s ༼ つ ◕_◕ ༽つ %s * %d
 
 config.gibme.chance=Chance To Gib
 config.gibme.chance.tooltip=Chance to gib an item from the list [default: 0.2]
@@ -8,3 +9,6 @@ config.gibme.cooldown.tooltip=Seconds between each attempt to gib [default: 1]
 
 config.gibme.list=Gib Me These
 config.gibme.list.tooltip=List of things to gib [format: modid:name:meta@amount]
+
+config.gibme.givecmd=Replace Give Command Message
+config.gibme.givecmd.tooltip=Replaces the give command chat message with a special gib message [default: true]
