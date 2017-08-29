@@ -90,7 +90,7 @@ public class GibMe {
         @Config.Name("Gib Me These")
         @Config.Comment("List of things to gib [format: modid:name:meta@amount]")
         @Config.LangKey("config.gibme.list")
-        public static String[] gibMeThese = { "minecraft:dirt:0@1" };
+        public static String[] gibMeThese = { "minecraft:dirt@4", "minecraft:wool:14", "minecraft:brick" };
 
         @Config.Name("Replace Give Command Message")
         @Config.Comment("Replaces the give command chat message with a special gib message [default: true]")
