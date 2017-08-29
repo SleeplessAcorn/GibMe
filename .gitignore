@@ -1,0 +1,12 @@
+# Gradle
+.gradle/
+build/
+
+# IntelliJ
+*.iml
+.idea/
+out/
+run/
+
+# Assets
+docs/

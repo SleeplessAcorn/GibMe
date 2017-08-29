@@ -1,0 +1,39 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven { name = "forge"; url = "https://files.minecraftforge.net/maven" }
+    }
+    dependencies {
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+version = "${mcVersion}-${modVersion}"
+group = "info.sleeplessacorn.gibme"
+archivesBaseName = "gibme"
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+minecraft {
+    version = "${mcVersion}-${mcfVersion}"
+    mappings = mcpMappings
+    runDir = "run"
+
+    replace '%VERSION%', modVersion
+    replaceIn 'GibMe.java'
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info', 'pack.mcmeta'
+        expand  'mod_version': modVersion,
+                'mc_version': mcVersion
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info', 'pack.mcmeta'
+    }
+}

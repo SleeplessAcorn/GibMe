@@ -1,0 +1,16 @@
+[
+	{
+	  "modid": "༼ つ ◕_◕ ༽つ",
+	  "name": "༼ つ ◕_◕ ༽つ",
+	  "description": "༼ つ ◕_◕ ༽つ GibMe ༼ つ ◕_◕ ༽つ",
+	  "version": "${mod_version}",
+	  "mcversion": "${mc_version}",
+	  "url": "",
+	  "updateUrl": "",
+	  "authorList": ["InsomniaKitten"],
+	  "credits": "TehNut, for the original mod.",
+	  "logoFile": "",
+	  "screenshots": [],
+	  "dependencies": []
+	}
+]
