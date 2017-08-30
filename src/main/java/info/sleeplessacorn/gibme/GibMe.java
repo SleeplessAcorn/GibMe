@@ -45,7 +45,7 @@ public class GibMe {
         if (event.player.world.getTotalWorldTime() % (GibConfig.attemptCooldown * 20) == 0) {
             Random rand = event.player.world.rand;
             if (rand.nextDouble() <= GibConfig.chanceToGib) {
-                ItemStack stack = ITEM_CACHE.get(rand.nextInt(GibConfig.gibMeThese.length));
+                ItemStack stack = ITEM_CACHE.get(rand.nextInt(ITEM_CACHE.size()));
                 event.player.inventory.addItemStackToInventory(stack.copy());
                 if (!GibConfig.displayMode.equals(GibConfig.DisplayMode.TOAST)) {
                     GibMe.sendGibMessage(event.player, stack);
