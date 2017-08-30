@@ -20,8 +20,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,7 +47,10 @@ public class GibMe {
                     .collect(Collectors.toList());
         }
 
-        if (!itemCache.isEmpty() && event.player.world.getTotalWorldTime() % (GibConfig.attemptCooldown * 20) == 0) {
+        CooldownTracker.addIfNotPresent(event.player);
+        CooldownTracker.increment(event.player);
+
+        if (!itemCache.isEmpty() && CooldownTracker.hasExpired(event.player)) {
             Random rand = event.player.world.rand;
             if (rand.nextDouble() <= GibConfig.chanceToGib) {
                 ItemStack stack = itemCache.get(rand.nextInt(itemCache.size()));
@@ -61,6 +63,7 @@ public class GibMe {
                     GibMe.sendGibMessage(event.player, stack);
                 }
             }
+            CooldownTracker.reset(event.player);
         }
     }
 
@@ -107,6 +110,30 @@ public class GibMe {
 
         protected static boolean isToastDisplay() {
             return TOAST.equals(GibConfig.displayMode);
+        }
+
+    }
+
+    private static final class CooldownTracker {
+
+        private static final Map<UUID, Integer> TRACKER = new HashMap<>();
+
+        private static void addIfNotPresent(EntityPlayer player) {
+            TRACKER.putIfAbsent(player.getUniqueID(), 0);
+        }
+
+        private static void reset(EntityPlayer player) {
+            TRACKER.put(player.getUniqueID(), 0);
+        }
+
+        private static void increment(EntityPlayer player) {
+            int oldValue = TRACKER.get(player.getUniqueID());
+            TRACKER.put(player.getUniqueID(), ++oldValue);
+        }
+
+        private static boolean hasExpired(EntityPlayer player) {
+            return TRACKER.get(player.getUniqueID())
+                    >= GibConfig.attemptCooldown * 20;
         }
 
     }
