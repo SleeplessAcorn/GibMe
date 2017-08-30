@@ -84,10 +84,11 @@ public class GibMe {
     @Mod.EventBusSubscriber
     protected static class GibConfig {
 
-        @Config.Name("Gib Display Mode")
-        @Config.Comment("The format that the gib message is displayed in [default: HOTBAR]")
-        @Config.LangKey("config.gibme.displaymode")
-        public static DisplayMode displayMode = DisplayMode.HOTBAR;
+        @Config.Name("Attempt Cooldown")
+        @Config.Comment("Seconds between each attempt to gib [default: 1]")
+        @Config.LangKey("config.gibme.cooldown")
+        @Config.RangeInt(min = 1)
+        public static int attemptCooldown = 1;
 
         @Config.Name("Chance To Gib")
         @Config.Comment("Chance to gib an item from the list [default: 0.2]")
@@ -95,11 +96,10 @@ public class GibMe {
         @Config.RangeInt(min = 0)
         public static double chanceToGib = 0.2;
 
-        @Config.Name("Attempt Cooldown")
-        @Config.Comment("Seconds between each attempt to gib [default: 1]")
-        @Config.LangKey("config.gibme.cooldown")
-        @Config.RangeInt(min = 1)
-        public static int attemptCooldown = 1;
+        @Config.Name("Gib Display Mode")
+        @Config.Comment("The format that the gib message is displayed in [default: HOTBAR]")
+        @Config.LangKey("config.gibme.displaymode")
+        public static DisplayMode displayMode = DisplayMode.HOTBAR;
 
         @Config.Name("Gib Me These")
         @Config.Comment("List of things to gib [format: modid:name:meta@amount]")
