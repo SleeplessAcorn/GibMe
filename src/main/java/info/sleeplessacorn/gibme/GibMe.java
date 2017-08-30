@@ -1,5 +1,6 @@
 package info.sleeplessacorn.gibme;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -29,16 +30,14 @@ public class GibMe {
         if (event.side != Side.SERVER || GibConfig.chanceToGib == 0 || !Phase.END.equals(event.phase))
             return;
 
-        GibConfig.regenerateItemCache();
-
         GibTracker.addCooldownIfAbsent(event.player);
         GibTracker.incrementCooldown(event.player);
 
-        if (!GibConfig.hasItems() && GibTracker.hasCooldownExpired(event.player)) {
+        if (GibConfig.hasItems() && GibTracker.hasCooldownExpired(event.player)) {
             Random rand = event.player.world.rand;
             if (rand.nextDouble() <= GibConfig.chanceToGib) {
-                @SuppressWarnings("ConstantConditions")
-                ItemStack stack = GibConfig.getItems().get(rand.nextInt(GibConfig.getItems().size()));
+                ImmutableList<ItemStack> items = GibConfig.getItems();
+                ItemStack stack = items.get(rand.nextInt(items.size()));
                 event.player.inventory.addItemStackToInventory(stack.copy());
                 if (GibConfig.DisplayMode.isToastDisplay()) {
                     String msg = ChatFormatting.RED + "Toast Notification NYI";

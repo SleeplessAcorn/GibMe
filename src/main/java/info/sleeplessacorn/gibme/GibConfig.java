@@ -12,7 +12,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,7 +20,7 @@ import java.util.stream.Stream;
 public class GibConfig {
 
     @Nullable
-    private static List<ItemStack> itemCache;
+    private static volatile ImmutableList<ItemStack> itemCache;
 
     @Config.Name("Attempt Cooldown")
     @Config.Comment("Seconds between each attempt to gib [default: 1]")
@@ -54,26 +53,26 @@ public class GibConfig {
     protected static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
         if (GibMe.GIB.equals(event.getModID())) {
             ConfigManager.sync(GibMe.GIB, Config.Type.INSTANCE);
-            itemCache = null; // invalidate
+            invalidateItemCache();
         }
     }
 
-    @Nullable
-    public static List<ItemStack> getItems() {
-        return ImmutableList.copyOf(itemCache);
+    private static synchronized void invalidateItemCache() {
+        itemCache = null;
+    }
+
+    public static synchronized ImmutableList<ItemStack> getItems() {
+        if (itemCache == null) {
+            itemCache = ImmutableList.copyOf(Stream.of(GibConfig.gibMeThese)
+                    .map(GibConfig::getStackFromString)
+                    .filter(stack -> !stack.isEmpty())
+                    .collect(Collectors.toList()));
+        }
+        return itemCache;
     }
 
     public static boolean hasItems() {
-        return !itemCache.isEmpty();
-    }
-
-    protected static void regenerateItemCache() {
-        if (itemCache == null) {
-            itemCache = Stream.of(GibConfig.gibMeThese)
-                    .map(GibConfig::getStackFromString)
-                    .filter(stack -> !stack.isEmpty())
-                    .collect(Collectors.toList());
-        }
+        return getItems().size() > 0;
     }
 
     private static ItemStack getStackFromString(String string) {
