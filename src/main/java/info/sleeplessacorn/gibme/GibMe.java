@@ -53,18 +53,19 @@ public class GibMe {
             if (rand.nextDouble() <= GibConfig.chanceToGib) {
                 ItemStack stack = itemCache.get(rand.nextInt(itemCache.size()));
                 event.player.inventory.addItemStackToInventory(stack.copy());
-                if (!GibConfig.displayMode.equals(GibConfig.DisplayMode.TOAST)) {
-                    GibMe.sendGibMessage(event.player, stack);
-                } else {
+                if (DisplayMode.isToastDisplay()) {
                     String msg = ChatFormatting.RED + "Toast Notification NYI";
                     event.player.sendStatusMessage(new TextComponentString(msg), false);
                     // FIXME Clientbound packets for toast notifications
+                } else {
+                    GibMe.sendGibMessage(event.player, stack);
                 }
             }
         }
     }
 
-    @SubscribeEvent @SideOnly(Side.CLIENT)
+    @SubscribeEvent
+    @SideOnly(Side.CLIENT)
     public static void onClientChatReceived(ClientChatReceivedEvent event) {
         if (!GibConfig.replaceGiveCmdMsg)
             return;
@@ -78,10 +79,6 @@ public class GibMe {
         }
     }
 
-    private static void invalidateItemCache() {
-        itemCache = null;
-    }
-
     private static ItemStack getStackFromString(String string) {
         String[] values = string.split("@"), data = values[0].split(":");
         int amount = values.length > 1 ? Integer.valueOf(values[1]) : 1;
@@ -93,8 +90,25 @@ public class GibMe {
     public static void sendGibMessage(EntityPlayer player, ItemStack stack) {
         String loc = "message.gibme", name = stack.getDisplayName();
         ITextComponent message = new TextComponentTranslation(loc, name);
-        boolean actionBar = GibConfig.displayMode.equals(GibConfig.DisplayMode.HOTBAR);
-        player.sendStatusMessage(message, actionBar);
+        player.sendStatusMessage(message, DisplayMode.useActionBar());
+    }
+
+    private static void invalidateItemCache() {
+        itemCache = null;
+    }
+
+    public enum DisplayMode {
+
+        CHAT, HOTBAR, TOAST;
+
+        protected static boolean useActionBar() {
+            return HOTBAR.equals(GibConfig.displayMode);
+        }
+
+        protected static boolean isToastDisplay() {
+            return TOAST.equals(GibConfig.displayMode);
+        }
+
     }
 
     @Config(modid = GibMe.GIB, name = GibMe.ME, category = GibMe.GIB)
@@ -121,7 +135,7 @@ public class GibMe {
         @Config.Name("Gib Me These")
         @Config.Comment("List of things to gib [format: modid:name:meta@amount]")
         @Config.LangKey("config.gibme.list")
-        public static String[] gibMeThese = { "minecraft:dirt@4", "minecraft:wool:14", "minecraft:brick" };
+        public static String[] gibMeThese = {"minecraft:dirt@4", "minecraft:wool:14", "minecraft:brick"};
 
         @Config.Name("Replace Give Command Message")
         @Config.Comment("Replaces the give command chat message with a special gib message [default: true]")
@@ -135,8 +149,6 @@ public class GibMe {
                 GibMe.invalidateItemCache();
             }
         }
-
-        public enum DisplayMode { CHAT, HOTBAR, TOAST }
 
     }
 
