@@ -1,10 +1,12 @@
 package info.sleeplessacorn.gibme;
 
+import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.config.Config;
@@ -38,7 +40,13 @@ public class GibMe {
                 int index = rand.nextInt(GibConfig.gibMeThese.length);
                 ItemStack stack = GibMe.getStackFromString(GibConfig.gibMeThese[index]);
                 event.player.inventory.addItemStackToInventory(stack.copy());
-                GibMe.sendGibMessage(event.player, stack);
+                if (!GibConfig.displayMode.equals(GibConfig.DisplayMode.TOAST)) {
+                    GibMe.sendGibMessage(event.player, stack);
+                } else {
+                    String msg = ChatFormatting.RED + "Toast Notification NYI";
+                    event.player.sendStatusMessage(new TextComponentString(msg), false);
+                    // FIXME Clientbound packets for toast notifications
+                }
             }
         }
     }
@@ -68,12 +76,18 @@ public class GibMe {
     public static void sendGibMessage(EntityPlayer player, ItemStack stack) {
         String loc = "message.gibme", name = stack.getDisplayName();
         ITextComponent message = new TextComponentTranslation(loc, name);
-        player.sendStatusMessage(message, true);
+        boolean actionBar = GibConfig.displayMode.equals(GibConfig.DisplayMode.HOTBAR);
+        player.sendStatusMessage(message, actionBar);
     }
 
     @Config(modid = GibMe.GIB, name = GibMe.ME, category = GibMe.GIB)
     @Mod.EventBusSubscriber
     protected static class GibConfig {
+
+        @Config.Name("Gib Display Mode")
+        @Config.Comment("The format that the gib message is displayed in [default: HOTBAR]")
+        @Config.LangKey("config.gibme.displaymode")
+        public static DisplayMode displayMode = DisplayMode.HOTBAR;
 
         @Config.Name("Chance To Gib")
         @Config.Comment("Chance to gib an item from the list [default: 0.2]")
@@ -103,6 +117,8 @@ public class GibMe {
                 ConfigManager.sync(GibMe.GIB, Config.Type.INSTANCE);
             }
         }
+
+        public enum DisplayMode { CHAT, HOTBAR, TOAST }
 
     }
 

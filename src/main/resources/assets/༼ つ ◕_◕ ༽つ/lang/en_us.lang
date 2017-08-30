@@ -1,6 +1,9 @@
 message.gibme=༼ つ ◕_◕ ༽つ %s ༼ つ ◕_◕ ༽つ
 command.gibme=%s ༼ つ ◕_◕ ༽つ %s * %d
 
+config.gibme.displaymode=Gib Display Mode
+config.gibme.displaymode.tooltip=The format that the gib message is displayed in [default: CHAT]
+
 config.gibme.chance=Chance To Gib
 config.gibme.chance.tooltip=Chance to gib an item from the list [default: 0.2]
 
