@@ -11,20 +11,20 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class ToastGibMe implements IToast {
+public class GibToast implements IToast {
 
     private final ItemStack stack;
     private long timestamp = -1;
 
-    public ToastGibMe(ItemStack stack) {
+    public GibToast(ItemStack stack) {
         this.stack = stack;
     }
 
     @Override
     public Visibility draw(GuiToast toast, long delta) {
-        if (timestamp < 0) {
+        if (timestamp < 0)
             timestamp = delta;
-        }
+
         if (!stack.isEmpty()) {
             Minecraft mc = toast.getMinecraft();
             mc.getTextureManager().bindTexture(TEXTURE_TOASTS);
