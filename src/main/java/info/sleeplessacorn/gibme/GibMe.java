@@ -13,14 +13,17 @@ import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 @Mod(modid = GibMe.GIB, name = GibMe.GIB, dependencies = GibMe.DEPENDENCIES, version = GibMe.VERSION)
 @Mod.EventBusSubscriber
@@ -30,22 +33,24 @@ public class GibMe {
     public static final String DEPENDENCIES = "required-after:forge@[14.21.1.2387,)";
     public static final String VERSION = "[1.12,1.13)";
 
-    private static final List<ItemStack> ITEM_CACHE = new ArrayList<>();
-
-    @Mod.EventHandler
-    public void onPostInit(FMLPostInitializationEvent event) {
-        GibMe.parseConfigList();
-    }
+    @Nullable
+    private static List<ItemStack> itemCache;
 
     @SubscribeEvent
-    protected static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (GibConfig.chanceToGib == 0 || GibConfig.gibMeThese.length < 1 || event.player.world.isRemote)
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.side != Side.SERVER || GibConfig.chanceToGib == 0)
             return;
 
-        if (event.player.world.getTotalWorldTime() % (GibConfig.attemptCooldown * 20) == 0) {
+        if (itemCache == null)
+            itemCache = Stream.of(GibConfig.gibMeThese)
+                    .map(GibMe::getStackFromString)
+                    .filter(stack -> !stack.isEmpty())
+                    .collect(Collectors.toList());
+
+        if (!itemCache.isEmpty() && event.player.world.getTotalWorldTime() % (GibConfig.attemptCooldown * 20) == 0) {
             Random rand = event.player.world.rand;
             if (rand.nextDouble() <= GibConfig.chanceToGib) {
-                ItemStack stack = ITEM_CACHE.get(rand.nextInt(ITEM_CACHE.size()));
+                ItemStack stack = itemCache.get(rand.nextInt(itemCache.size()));
                 event.player.inventory.addItemStackToInventory(stack.copy());
                 if (!GibConfig.displayMode.equals(GibConfig.DisplayMode.TOAST)) {
                     GibMe.sendGibMessage(event.player, stack);
@@ -72,11 +77,8 @@ public class GibMe {
         }
     }
 
-    private static void parseConfigList() {
-        Arrays.stream(GibConfig.gibMeThese)
-                .map(GibMe::getStackFromString)
-                .filter(stack -> !stack.isEmpty())
-                .forEach(ITEM_CACHE::add);
+    private static void invalidateItemCache() {
+        itemCache = null;
     }
 
     private static ItemStack getStackFromString(String string) {
@@ -129,7 +131,7 @@ public class GibMe {
         protected static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
             if (GibMe.GIB.equals(event.getModID())) {
                 ConfigManager.sync(GibMe.GIB, Config.Type.INSTANCE);
-                GibMe.parseConfigList();
+                GibMe.invalidateItemCache();
             }
         }
 
