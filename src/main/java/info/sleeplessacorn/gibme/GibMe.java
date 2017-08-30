@@ -14,6 +14,7 @@ import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -83,6 +84,11 @@ public class GibMe {
         }
     }
 
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
+        CooldownTracker.remove(event.player);
+    }
+
     private static ItemStack getStackFromString(String string) {
         String[] values = string.split("@"), data = values[0].split(":");
         int amount = values.length > 1 ? Integer.valueOf(values[1]) : 1;
@@ -130,6 +136,10 @@ public class GibMe {
         private static void increment(EntityPlayer player) {
             int oldValue = TRACKER.get(player.getUniqueID());
             TRACKER.put(player.getUniqueID(), ++oldValue);
+        }
+
+        private static void remove(EntityPlayer player) {
+            TRACKER.remove(player.getUniqueID());
         }
 
         private static boolean hasExpired(EntityPlayer player) {
