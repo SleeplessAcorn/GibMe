@@ -19,11 +19,11 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 @Mod(modid = GibMe.GIB, name = GibMe.GIB, dependencies = GibMe.DEPENDENCIES, version = GibMe.VERSION)
 @Mod.EventBusSubscriber
@@ -41,11 +41,12 @@ public class GibMe {
         if (event.side != Side.SERVER || GibConfig.chanceToGib == 0)
             return;
 
-        if (itemCache == null)
+        if (itemCache == null) {
             itemCache = Stream.of(GibConfig.gibMeThese)
                     .map(GibMe::getStackFromString)
                     .filter(stack -> !stack.isEmpty())
                     .collect(Collectors.toList());
+        }
 
         if (!itemCache.isEmpty() && event.player.world.getTotalWorldTime() % (GibConfig.attemptCooldown * 20) == 0) {
             Random rand = event.player.world.rand;
