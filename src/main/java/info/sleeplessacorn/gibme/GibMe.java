@@ -14,7 +14,8 @@ import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -36,8 +37,8 @@ public class GibMe {
     private static List<ItemStack> itemCache;
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.side != Side.SERVER || GibConfig.chanceToGib == 0 || !TickEvent.Phase.END.equals(event.phase))
+    public static void onPlayerTick(PlayerTickEvent event) {
+        if (event.side != Side.SERVER || GibConfig.chanceToGib == 0 || !Phase.END.equals(event.phase))
             return;
 
         if (itemCache == null) {
