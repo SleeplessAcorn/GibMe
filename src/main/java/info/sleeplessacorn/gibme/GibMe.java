@@ -37,7 +37,7 @@ public class GibMe {
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.side != Side.SERVER || GibConfig.chanceToGib == 0)
+        if (event.side != Side.SERVER || GibConfig.chanceToGib == 0 || !TickEvent.Phase.END.equals(event.phase))
             return;
 
         if (itemCache == null) {
