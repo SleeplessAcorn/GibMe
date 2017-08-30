@@ -27,6 +27,7 @@ minecraft {
 }
 
 processResources {
+    filteringCharset = 'UTF-8'
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info', 'pack.mcmeta'
         expand  'mod_version': modVersion,
@@ -36,4 +37,8 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info', 'pack.mcmeta'
     }
+}
+
+tasks.withType(JavaCompile) { task ->
+    task.options.encoding = 'UTF-8'
 }
