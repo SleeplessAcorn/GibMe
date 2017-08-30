@@ -62,8 +62,8 @@ public class GibMe {
                 } else {
                     GibMe.sendGibMessage(event.player, stack);
                 }
+                CooldownTracker.reset(event.player);
             }
-            CooldownTracker.reset(event.player);
         }
     }
 
