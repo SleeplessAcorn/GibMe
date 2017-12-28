@@ -11,12 +11,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GibToast implements IToast {
+public final class GibToast implements IToast {
 
     private final ItemStack stack;
     private long timestamp = -1;
 
-    public GibToast(ItemStack stack) {
+    protected GibToast(ItemStack stack) {
         this.stack = stack;
     }
 

@@ -14,6 +14,8 @@ public final class GibTracker {
 
     private static final Map<UUID, Integer> TRACKER = new HashMap<>();
 
+    private GibTracker() {}
+
     protected static void addCooldownIfAbsent(EntityPlayer player) {
         TRACKER.putIfAbsent(player.getUniqueID(), 0);
     }
@@ -32,13 +34,13 @@ public final class GibTracker {
     }
 
     protected static boolean hasCooldownExpired(EntityPlayer player) {
-        return TRACKER.get(player.getUniqueID())
-                >= GibConfig.attemptCooldown * 20;
+        long ticks = GibConfig.attemptCooldown * 20;
+        return TRACKER.get(player.getUniqueID()) >= ticks;
     }
 
     @SubscribeEvent
     protected static void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        GibTracker.removeCooldown(event.player);
+        removeCooldown(event.player);
     }
 
 }
