@@ -23,7 +23,7 @@ public class GibMe {
 
     public static final String GIB = "༼ つ ◕_◕ ༽つ", ME = "gibme";
     public static final String DEPENDENCIES = "required-after:forge@[14.21.1.2387,)";
-    public static final String VERSION = "[1.12,1.13)";
+    public static final String VERSION = "%VERSION%";
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent event) {
