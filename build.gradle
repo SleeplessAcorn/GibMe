@@ -1,37 +1,33 @@
 buildscript {
     repositories {
         jcenter()
-        maven { name = "forge"; url = "https://files.minecraftforge.net/maven" }
+        maven { url 'https://files.minecraftforge.net/maven' }
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "${mcVersion}-${modVersion}"
-group = "info.sleeplessacorn.gibme"
-archivesBaseName = "gibme"
-
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+version = "1.12-${modVersion}"
+group = 'info.sleeplessacorn.gibme'
+archivesBaseName = 'gibme'
+sourceCompatibility = 1.8
 
 minecraft {
-    version = "${mcVersion}-${mcfVersion}"
+    version = mcfVersion
     mappings = mcpMappings
     runDir = "run"
-
-    replace '%VERSION%', modVersion
     replaceIn 'GibMe.java'
+    replace '%VERSION%', modVersion
 }
 
 processResources {
     filteringCharset = 'UTF-8'
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info', 'pack.mcmeta'
-        expand  'mod_version': modVersion,
-                'mc_version': mcVersion
+        expand 'version': modVersion
     }
 
     from(sourceSets.main.resources.srcDirs) {
@@ -39,6 +35,6 @@ processResources {
     }
 }
 
-tasks.withType(JavaCompile) { task ->
-    task.options.encoding = 'UTF-8'
+tasks.withType(JavaCompile) {
+    task -> task.options.encoding = 'UTF-8'
 }
