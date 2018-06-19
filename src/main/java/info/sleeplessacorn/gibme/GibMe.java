@@ -1,12 +1,11 @@
 package info.sleeplessacorn.gibme;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.realmsclient.gui.ChatFormatting;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -17,30 +16,34 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 
-@Mod(modid = GibMe.GIB, name = GibMe.GIB, version = GibMe.VERSION)
-@Mod.EventBusSubscriber(modid = GibMe.GIB)
+@Mod(modid = GibMe.ID, name = GibMe.ID, version = GibMe.VERSION)
+@Mod.EventBusSubscriber(modid = GibMe.ID)
 public final class GibMe {
-
-    public static final String GIB = "༼ つ ◕_◕ ༽つ";
-    public static final String ME = "gibme";
+    public static final String ID = "༼ つ ◕_◕ ༽つ";
+    public static final String NAME = "gibme";
     public static final String VERSION = "%VERSION%";
 
     @SubscribeEvent
-    protected static void onPlayerTick(PlayerTickEvent event) {
-        if (event.side == Side.SERVER && GibConfig.chanceToGib > 0 && Phase.END.equals(event.phase)) {
+    static void onPlayerTick(PlayerTickEvent event) {
+        if (Side.SERVER == event.side && Phase.END == event.phase && GibConfig.chanceToGib > 0) {
             GibTracker.addCooldownIfAbsent(event.player);
             GibTracker.incrementCooldown(event.player);
             if (GibConfig.hasItems() && GibTracker.hasCooldownExpired(event.player)) {
-                Random rand = event.player.world.rand;
+                final Random rand = event.player.world.rand;
                 if (rand.nextDouble() <= GibConfig.chanceToGib) {
-                    ImmutableList<ItemStack> items = GibConfig.getItems();
-                    ItemStack stack = items.get(rand.nextInt(items.size()));
+                    final ImmutableList<ItemStack> items = GibConfig.getItems();
+                    final ItemStack stack = items.get(rand.nextInt(items.size()));
                     event.player.inventory.addItemStackToInventory(stack.copy());
-                    if (GibConfig.DisplayMode.isToastDisplay()) {
-                        String msg = ChatFormatting.RED + "Toast Notification NYI";
-                        event.player.sendStatusMessage(new TextComponentString(msg), false);
+                    if (GibConfig.displayMode.isToast()) {
+                        final ITextComponent msg = new TextComponentString("Toast Notification NYI");
+                        msg.getStyle().setColor(TextFormatting.RED);
+                        event.player.sendStatusMessage(msg, false);
                         // FIXME Client-bound packets for toast notifications
-                    } else GibMe.sendGibMessage(event.player, stack);
+                    } else {
+                        final String name = stack.getDisplayName();
+                        final ITextComponent msg = new TextComponentTranslation("message.gibme", name);
+                        event.player.sendStatusMessage(msg, GibConfig.displayMode.usesActionBar());
+                    }
                     GibTracker.resetCooldown(event.player);
                 }
             }
@@ -49,19 +52,13 @@ public final class GibMe {
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
-    protected static void onClientChatReceived(ClientChatReceivedEvent event) {
+    static void onClientChatReceived(ClientChatReceivedEvent event) {
         if (GibConfig.replaceGiveCmdMsg && event.getMessage() instanceof TextComponentTranslation) {
-            TextComponentTranslation msg = (TextComponentTranslation) event.getMessage();
+            final TextComponentTranslation msg = (TextComponentTranslation) event.getMessage();
             if ("commands.give.success".equals(msg.getKey())) {
-                Object[] args = msg.getFormatArgs();
+                final Object[] args = msg.getFormatArgs();
                 event.setMessage(new TextComponentTranslation("command.gibme", args[2], args[0], args[1]));
             }
         }
     }
-
-    private static void sendGibMessage(EntityPlayer player, ItemStack stack) {
-        ITextComponent message = new TextComponentTranslation("message.gibme", stack.getDisplayName());
-        player.sendStatusMessage(message, GibConfig.DisplayMode.useActionBar());
-    }
-
 }
