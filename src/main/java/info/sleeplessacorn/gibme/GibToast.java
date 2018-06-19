@@ -1,5 +1,6 @@
 package info.sleeplessacorn.gibme;
 
+import lombok.RequiredArgsConstructor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.toasts.GuiToast;
@@ -12,16 +13,13 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
+@RequiredArgsConstructor
 final class GibToast implements IToast {
     private static final String TITLE = "toast.gibme.title";
     private static final String DESC = "toast.gibme.description";
 
     private final ItemStack stack;
     private long timestamp = -1;
-
-    GibToast(ItemStack stack) {
-        this.stack = stack;
-    }
 
     @Override
     public Visibility draw(GuiToast toast, long delta) {

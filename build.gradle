@@ -8,6 +8,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.14'
+}
+
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.12-$modVersion"
@@ -33,6 +37,11 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info', 'pack.mcmeta'
     }
+}
+
+lombok {
+    version = '1.18.0'
+    sha256 = ''
 }
 
 tasks.withType(JavaCompile) {
